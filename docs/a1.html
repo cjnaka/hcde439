@@ -4,15 +4,87 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>Carson Nakagawaras Physical Computing Page!</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 1!</h1>
+    <h1>Carson Nakagawara's Assignment 1!</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
+      <img src="a1.gif" alt=""Blinking LEDs GIF/>
       <p>Here is all the documentation for assignment 1!</p>
     </div>
+
+    <h2>Schematic</h2>
+    <div class="assignment-section">
+      <img src="a1-schematic.jpeg" width="600" alt="Schematic of 4 LEDs" />
+      <p> 
+        This schematic shows 4 LEDs (2 red and 2 green) connected to pins 0, 1, 2, and 3. It also shows how I calculated the resistor, which is 220 ohms for each LED.
+      </p>
+    </div>
+
+    <h2>Circuit</h2>
+    <div class="assignment-section">
+      <img src="a1-circuit.jpeg" width="600" alt="Photo of breadboard circuit" />
+      <p>
+        This is the physical implementation of the circuit on the breadboard, LEDs, resistors, and connection to the ground/pins.
+      </p>
+    </div>
+
+    <h2>Code</h2>
+    <div class="assignment-section">
+      <p>Below is the code used to control the LEDs.</p>
+      <pre><code>
+        // 1000 ms timer
+        int timer = 1000;
+
+        void setup() {
+          // use a for loop to initialize each pin as an output:
+          for (int thisPin = 0; thisPin < 4; thisPin++) {
+            pinMode(thisPin, OUTPUT);
+          }
+        }
+
+        // the loop function runs over and over again forever
+        void loop() {
+          // loop from the lowest pin to the highest:
+          for (int thisPin = 0; thisPin < 2; thisPin++) {
+            // turn pin 0 or 1 on:
+            digitalWrite(thisPin, HIGH);  
+            // turn pin 2 or 3on:
+            digitalWrite(thisPin + 2, HIGH);  
+            // delay next action:
+            delay(timer);  
+            // turn pin 0 or 1 off:
+            digitalWrite(thisPin, LOW);
+            // turn pin 2 or 3 off:
+            digitalWrite(thisPin + 2, LOW);
+          }
+        }
+      </code></pre>
+    </div>
+
+    <h2>Additional Questions</h2>
+
+    <h3>(1)</h3>
+    <img src="a1-voltage.jpeg" width="600" alt="Voltage measurement photo" />
+    <p>
+      The graph above shows the voltage of my red and green LEDs over times. The red represents the 2 Red LEDs and the green represents the 2 Green LEDs. 
+    </p>
+
+    <h3>(2)</h3>
+    <p>
+      I could blink independently 14 LEDs because it has 14 digital pins from 0 to 13. With each LED drawing 20mA, that would draw 280mA total.
+    </p>
+
+    <h3>(3)</h3>
+    <p>
+      In order to no longer tell the LEDs are blinking, I would need to blink them around 30 to 60 times per second.  
+    </p>
+
+    <h3>(4)</h3>
+    <p>
+      I used Google Gemini to help me format the HTML for this page, as well as to help correctly copy over my code to be displayed easily on the page.
+    </p>
   </body>
 </html>
