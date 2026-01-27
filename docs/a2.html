@@ -4,15 +4,155 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>Carson Nakagawara's Physical Computing Page!</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 2!</h1>
+    <h1>Carson Nakagawara's Assignment 2!</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
+      <img src="a2.gif" alt="Fading LEDs GIF"/>
       <p>Here is all the documentation for assignment 2!</p>
     </div>
+
+    <h2>Schematic</h2>
+    <div class="assignment-section">
+      <img src="a2-schematic.jpeg" width="600" alt="Schematic of 4 LEDs" />
+      <p> 
+        This schematic shows 4 LEDs (red, green, blue, and yellow) connected to pins ~11, ~5, ~6, and 13. The red, green, and blue are all apart of the same RGB LED. It also shows the schematic for the button that turns the system on.
+      </p>
+    </div>
+
+    <h2>Calculations</h2>
+    <div class="assignment-section">
+      <img src="a2-calculations.jpeg" width="600" alt="Resistor calculations" />
+      <p>
+        These were my calculations for determining which resistors to use for each LED pin. I decided to use 220 ohm resisters for every LED pin.
+      </p>
+    </div>
+
+    <h2>Circuit</h2>
+    <div class="assignment-section">
+      <img src="a2-circuit.jpeg" width="600" alt="Photo of breadboard circuit" />
+      <p>
+        This is the physical implementation of the circuit on the breadboard, LEDs, button, resistors, and connection to the ground/pins.
+      </p>
+    </div>
+
+    <h2>Code</h2>
+    <div class="assignment-section">
+      <p>Below is the code used to control the LEDs.</p>
+      <pre><code>
+        // the number of the button pin
+        const int buttonPin = 2;  
+        // the number of the yellow LED pin
+        const int yled = 13;  
+        // the number of the red LED pin
+        const int rled = 11;  
+        // the number of the green LED pin
+        const int gled = 5;  
+        // the number of the blue LED pin
+        const int bled = 6;  
+
+        // variable for reading the pushbutton status
+        int buttonState = 0;  
+        // initial brightness
+        int brightness = 0;
+        // fade value
+        int fade = 5;
+        // current color with 0=red, 1=green, 2=blue
+        int currentColor = 0;
+
+        void setup() {
+          // initialize the yellow LED pin as an output:
+          pinMode(yled, OUTPUT);
+          // initialize the red LED pin as an output:
+          pinMode(rled, OUTPUT);
+          // initialize the green LED pin as an output:
+          pinMode(gled, OUTPUT);
+          // initialize the blue LED pin as an output:
+          pinMode(bled, OUTPUT);
+
+          // initialize the pushbutton pin as an input:
+          pinMode(buttonPin, INPUT);
+        }
+
+        void loop() {
+          // read the state of the pushbutton value:
+          buttonState = digitalRead(buttonPin);
+
+          // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+          if (buttonState == HIGH) {
+            // create an array for the rgb pins
+            int pins[] = {rled, gled, bled};
+            // cycle through the array
+            for (int i = 0; i < 3; i++) {
+              int currentPin = pins[i];
+
+              //reset brightness for beginning of each color
+              brightness = 0;
+              // fade the current pin brighter
+              for (brightness = 0; brightness <= 255; brightness += fade) {
+                // set the current pin to desired brightness
+                analogWrite(currentPin, brightness);
+                // blink the yellow LED when the brightness of the current LED is high
+                if (brightness > 127) {
+                  digitalWrite(yled, HIGH);
+                } else {
+                  digitalWrite(yled, LOW);
+                }
+                // delay for 20 milliseconds
+                delay(20);
+              }
+
+              //fade the current pin dimmer
+              for (brightness = 255; brightness >= 0; brightness -= fade) {
+                // set the current pin to desired brightness
+                analogWrite(currentPin, brightness);
+                // blink the yellow LED when the brightness of the current LED is high
+                if (brightness > 127) {
+                  digitalWrite(yled, HIGH);
+                } else {
+                  digitalWrite(yled, LOW);
+                }
+                // delay for 20 milliseconds
+                delay(20);
+              }
+
+              // turn off the current LED before the next color
+              analogWrite(currentPin, 0);
+            }
+
+          } else {
+            // turn LEDs off:
+            digitalWrite(yled, LOW);
+            analogWrite(rled, 0);
+            analogWrite(gled, 0);
+            analogWrite(bled, 0);
+          }
+        }
+      </code></pre>
+    </div>
+
+    <h2>Additional Questions</h2>
+
+    <h3>1: Draw a chart where the X axis is time and the Y axis is voltage. Draw 3 lines representing the voltage across an LED with analogWrite(led, 64), analogWrite(led, 128), and analogWrite(led, 255).</h3>
+    <img src="a2-question.jpeg" width="600" alt="Voltage measurement photo" />
+
+    <h3>2: If all your LEDs were on simultaneously, what would the total current draw be? Is this above or below the total Arduino current draw limits? If all your LEDs were on, how long would your circuit run if powered by a 1200 mAh battery?</h3>
+    <p>
+      The current draw for each of my LEDs is 20mA, giving me a total of 80mA if all my LEDs were on simultaneously. It is below the toal Arduino current draw limits of 200mA. If all of my LEDs were on, my circuit would be able to run for 1200mAh / 80mA = 15 hours, if powered by a 1200 mAh battery.
+    </p>
+
+    <h3>3: Measure and record the actual voltage across one of your LEDs when it's on. How does this compare to the theoretical forward voltage for your LED color?</h3>
+    <p>
+      I measured a voltage of 2.0V for the yellow LED when it was on. The theoretical voltage for a yellow LED is about 2.1V, so my measured voltage is extremely close to the theoretical voltage.
+    </p>
+
+    <h3>4: Did you use AI tools in completing this assignment? If yes, please provide details on how/when, as well as a brief reflection. If no, you can either leave this question blank, or provide other information if you'd like.</h3>
+    <p>
+      I used Google Gemini to help me understand how to build the array within my Arduino code to cycle through the RGB pin colors.
+    </p>
   </body>
 </html>
+
