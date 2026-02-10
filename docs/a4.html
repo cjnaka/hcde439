@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Carson Nakagawara's Physical Computing Page!</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Carson Nakagawara's Assignment 2!</h1>
+    <div class="header">
+      <img src="a4.gif" alt="Servo motor gif"/>
+      <p>Here is all the documentation for assignment 4!</p>
+    </div>
+
+    <h2>Schematic</h2>
+    <div class="assignment-section">
+      <img src="a4-schematic.jpeg" width="600" alt="Schematic of red LED, Servo motor, and joystick" />
+      <p> 
+        This schematic shows a red LED connected to pin 13, the servo motor connect to pin ~9, and the joystick connected to pins A0, A2, and 2. I calculated 150 ohms for a resistor for the red LED and ended up using a 220 ohm resistor.
+      </p>
+    </div>
+
+    <h2>Circuit</h2>
+    <div class="assignment-section">
+      <img src="a4-circuit.jpeg" width="600" alt="Photo of breadboard circuit" />
+      <p>
+        This is the physical implementation of the circuit on the breadboard, LED, servo motor, joystick, resistor, and connection to the ground/pins.
+      </p>
+    </div>
+
+    <h2>Code</h2>
+    <div class="assignment-section">
+      <p>Below is the code used to control the system.</p>
+      <pre><code>
+        #include <Servo.h>
+
+        // create servo object
+        Servo myServo;
+
+        // Analog pin for Y-axis
+        const int y = A0;
+        // Analog pin for X-axis
+        const int x = A1;
+        // Digital pin for button
+        const int sw = 2;
+        // PWM pin for servo
+        const int servo = 9;
+        // LED to pin 13
+        const int led = 13;
+
+        // store center of X
+        int xRest = 512;
+        // sotre center of Y
+        int yRest = 512;
+
+        void setup() {
+        // attaches servo on pin 9 to the servo object
+        myServo.attach(servo);
+
+        // set LED as output
+        pinMode(led, OUTPUT);
+
+        // set switch pin as input with pull-up resistor
+        pinMode(sw, INPUT_PULLUP);
+        
+        // read at start to see where center is
+        xRest = analogRead(x);
+        yRest = analogRead(y);
+        }
+
+        void loop() {
+        // read current state of switch
+        int btnState = digitalRead(sw);
+
+        // read current values of joystick
+        int xValue = analogRead(x);
+        int yValue = analogRead(y);
+
+        // if y-axis is moved away from resting point, LED lights up
+        if (yValue > (yRest + 50) || yValue < (yRest - 50)) {
+            digitalWrite(led, HIGH);
+        } else { // else LED is off
+            digitalWrite(led, LOW);
+        }
+
+        // if button is pressed, servo forced to 180 degrees
+        if (btnState == LOW) {
+            myServo.write(180);
+        } else {
+            // map joystick range (0-1023) to actual servo range(0-180)
+            int angle = map(xValue, 0, 1023, 0, 180);
+            // write angle to servo
+            myServo.write(angle);
+        }
+
+        // wait for servo to get there
+        delay(15);
+        }
+      </code></pre>
+    </div>
+
+    <h2>Additional Questions</h2>
+
+    <h3>1: Say you are using a servo motor you attach to pin 9. In your loop() you have the following code:
+            void loop() {
+                for (pos = 0; pos <= 180; pos += 1) {
+                myservo.write(pos); 
+                delay(100); 
+                }
+            }
+        Draw a graph with the x-axis as time and the y-axis as voltage at pin 9 with respect to ground.
+    </h3>
+    <img src="a4-example.jpeg" width="600" alt="Voltage vs Time Graph" />
+     
+    <h3>2: Your input device is slightly broken, leading it to give us an erroneous reading 1% of the time. How can we address this? Answer in (pseudo)code.</h3>
+    <pre><code>
+        lastValidReading = readSensor();
+
+        loop:
+            newReading = readSensor();
+            
+            // check if new reading is within valid range
+            if newReading < 0 || newReading > 1023:
+                newReading = lastValidReading;
+
+            // check if new reading differs too much from last valid reading
+            else if abs(newReading - lastValidReading) > 100:
+                newReading = lastValidReading;
+
+            //update last valid reading
+            lastValidReading = newReading;
+    </code></pre>
+
+    <h3>3: Your input device is slightly noisy, leading the measurement to randomly deviate from the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.</h3>
+    <pre><code>
+        loop:
+        // take multiple readings from same sensor
+        r1 = readSensor();
+        r2 = readSensor();
+        r3 = readSensor();
+
+        // find middle value (median)
+        medianValue = median(r1, r2, r3);
+
+        //use median value instead of single reading to control system
+        useValue(medianValue);
+    </code></pre>
+
+    <h4>4: Did you use AI tools in completing this assignment? If yes, please provide details on how/when, as well as a brief reflection. If you used an LLM, please 'share' your conversation and include it as part of your submission, or cite the prompt(s) you used and the output. If no, you can either leave this question blank, or provide other information if you'd like.</h4>
+    <p>
+        I used AI to help me think about finding the current position of the joystick and using that to control the servo motor. I also asked it how to implement my button press when I had it sitting at 90 degrees, it then helped me think of the degree differently where I changed it to 180 degrees and saw movement after changing that in my arduino code.
+    </p>
+  </body>
+</html>
+
