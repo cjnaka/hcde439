@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Carson Nakagawara's Physical Computing Page!</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Carson Nakagawara's Assignment 5!</h1>
+    <div class="header">
+      <img src="a5.gif" alt="Ultrasonic sensor fan gif"/>
+      <p>Here is all the documentation for assignment 5!</p>
+    </div>
+
+    <h2>Schematic</h2>
+    <div class="assignment-section">
+      <img src="a5-schematic.jpeg" width="600" alt="Schematic of ultrasonic sensor and fan" />
+      <p> 
+        This schematic shows the ultrasonic sensor connected to pins 11/12, GND, and the 5v. The N-MOSFET is connected to pin 9, GND, and the motor/fan which is connected to the 12V. I calculated a 10k ohm resistor for the MOSFET gate to draw 0.5mA when it is active (I = V/R = 5V/10,000 ohms = 0.5mA). The MOSFET can handle a max continuous current of 37.2A between drain and source. The DC motor operates at 12V with a max efficiency current of 0.11A and stall current of 0.35A, so the currents from the motor are within the transistor's limits.
+      </p>
+    </div>
+
+    <h2>Circuit</h2>
+    <div class="assignment-section">
+      <img src="a5-circuit.jpeg" width="600" alt="Photo of breadboard circuit" />
+      <p>
+        This is the physical implementation of the circuit on the breadboard, N-MOSFET, Ultrasonic Sensor, motor/fan, resistor, and connection to the ground/pins.
+      </p>
+    </div>
+
+    <h2>Code</h2>
+    <div class="assignment-section">
+      <p>Below is the code used to control the system.</p>
+      <pre><code>
+        // Pin that sends the sound pulse
+        const int trigPin = 12; 
+        // Pin that tracks the echo bounce
+        const int echoPin = 11; 
+
+        // Pin to control fan speed
+        const int motorPin = 9; 
+
+        // Time it takes for sound to travel
+        long duration; 
+        // Calculated distance in cm
+        int distance;  
+        // PWM value (0-170)
+        int motorSpeed; 
+
+        void setup() {
+        // Initialize Serial Monitor 
+        Serial.begin(9600); 
+        
+        // Set the trigger as an OUTPUT
+        pinMode(trigPin, OUTPUT); 
+        
+        // Set the echo as an INPUT
+        pinMode(echoPin, INPUT); 
+        
+        // Set the MOSFET pin as an OUTPUT
+        pinMode(motorPin, OUTPUT); 
+        }
+
+        void loop() {
+        // Clear trigPin by setting it LOW for 2 microseconds
+        digitalWrite(trigPin, LOW);
+        delayMicroseconds(2);
+        
+        // Trigger sensor by sending a 10-microsecond HIGH pulse
+        digitalWrite(trigPin, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trigPin, LOW);
+        
+        // Read the echoPin with travel time in ms 
+        duration = pulseIn(echoPin, HIGH);
+        
+        // Calculate distance: speed of sound is 0.034 cm/us and divide by 2 total trip
+        distance = duration * 0.034 / 2;
+        
+        // If sensor is out of range, we set it to a far distance
+        if (distance == 0 || distance > 200) {
+            distance = 200;
+        }
+
+        // Map distance (5cm to 40cm) to motor power (170 down to 0)
+        motorSpeed = map(distance, 5, 40, 170, 0);
+        
+        // Don't send values above 170 or below 0
+        motorSpeed = constrain(motorSpeed, 0, 170);
+
+        // Write the PWM signal to MOSFET gate to adjust fan speed
+        analogWrite(motorPin, motorSpeed);
+        
+        // Print results 
+        Serial.print("Distance: ");
+        Serial.print(distance);
+        Serial.print(" cm | Motor PWM: ");
+        Serial.println(motorSpeed);
+
+        delay(100);
+        }
+
+      </code></pre>
+    </div>
+
+    <h2>Additional Questions</h2>
+
+    <h3>1: These are the datasheets for the n-mosfet transistor: DMT6009LCT Links to an external site., IRLZ44N Links to an external site., P30N06LE Links to an external site.. Read the text on your mosfet to see which one you have. Links to an external site.For your mosfet, what is the absolute maximum amount of current between pins 2 and 3?</h3>
+    <p>For the DMT6009LCT, the absolute max amount of current between pins 2 and 3 is 37.2A.</p>
+     
+    <h3>2: Draw a schematic for a circuit with using at least your arduino, a DC motor, a flyback diode, and capacitors between power and ground. Find parts with datasheets you could use for each of these schematic components.</h3>
+    <img src="a5-example.jpeg" width="600" alt="Voltage vs Time Graph" />
+
+    <h3>3: Here is the datasheet for the L293D chip: https://www.ti.com/product/L293D Links to an external site.. Draw a schematic using at least your arduino, this chip, and two motors. Write (pseudo) code that shows how you would move the motors both forward, both back, then one forward one back, and one back then forward.</h3>
+    <img src="a5-example2.jpeg" width="600" alt="Voltage vs Time Graph" />
+    <pre><code>
+        // define pins for left motor
+        enable1 = 0
+        forward1 = 2
+        backward1 = 3
+
+        // define pins for right motor
+        enable2 = 10
+        forward2 = 4
+        backward2 = 5
+
+        loop:
+            // move both forward 
+            set forward1 = HIGH
+            set backward1 = LOW
+
+            set forward2 = HIGH
+            set backward2 = LOW
+            delay 2000
+
+            // move both backward
+            set forward1 = LOW
+            set backward1 = HIGH
+
+            set forward2 = LOW
+            set backward2 = HIGH
+            delay 2000
+
+            // move left forward, right backward
+            set forward1 = HIGH
+            set backward1 = LOW
+
+            set forward2 = LOW
+            set backward2 = HIGH
+            delay 2000
+
+            // move keft backward, right forward
+            set forward1 = LOW
+            set backward1 = HIGH
+
+            set forward2 = HIGH
+            set backward2 = LOW
+            delay 2000
+    </code></pre>
+
+    <h4>4: Did you use AI tools in completing this assignment? If yes, please provide details on how/when, as well as a brief reflection. If you used an LLM, please 'share' your conversation and include it as part of your submission, or cite the prompt(s) you used and the output. If no, you can either leave this question blank, or provide other information if you'd like.</h4>
+    <p>
+        I used Gemini to help me understand the functions of the ultrasonic sensor and how to incorporate the echo and trig wires within my code and breadboard, as we didn't go over it too much in class. It was helpful for me to think about how each wiring was going to work within my code and where to control each aspect.
+  </body>
+</html>
